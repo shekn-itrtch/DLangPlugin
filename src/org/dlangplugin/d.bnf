@@ -1,0 +1,378 @@
+{
+  parserClass="org.dlangplugin.parser.DParser"
+  parserUtilClass="org.dlangplugin.parser.DLangParserUtil"
+
+  implements="org.dlangplugin.psi.DLangCompositeElement"
+  extends="org.dlangplugin.psi.impl.DLangCompositeElementImpl"
+
+  elementTypeHolderClass="org.dlangplugin.psi.DTokenTypes"
+  //elementTypePrefix="DLN_"
+  elementTypeClass="org.dlangplugin.psi.DElementType"
+  tokenTypeClass="org.dlangplugin.psi.DTokenType"
+
+  psiClassPrefix="DLang"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.dlangplugin.psi"
+  psiImplPackage="org.dlangplugin.psi.impl"
+  psiImplUtilClass="org.dlangplugin.psi.impl.DLangPsiImplUtil"
+}
+dLangFile ::= item_*
+
+private item_ ::= (ModuleDeclaration | ImportDeclaration | Declaration | AttributeSpecifier | Statement | DeclDef
+                  |COMMENT|WHITE_SPACE|KEYWORD)
+
+COMMENT ::= (BLOCK_COMMENT|LINE_COMMENT|NESTING_BLOCK_COMMENT)
+
+STRING ::= (WYSIWYG_STRING|ALTERNATE_WYSIWYG_STRING|DOUBLE_QUOTED_STRING|HEX_STRING|DELIMITED_STRING)
+
+/** module statement (http://dlang.org/module.html) */
+ModuleDeclaration ::= KW_MODULE ModuleFullyQualifiedName OP_SCOLON
+ModuleFullyQualifiedName ::= (ID OP_DOT)* ID
+
+/** import statement (http://dlang.org/module.html#ImportDeclaration) */
+ImportDeclaration ::= KW_STATIC? KW_IMPORT ImportList OP_SCOLON
+ImportList ::= (ImportBindings | Import) (OP_COMMA (ImportBindings | Import))*
+Import ::= (ID OP_EQ)? ModuleFullyQualifiedName
+ImportBindings ::= Import OP_COLON ImportBind (OP_COMMA ImportBind)*
+ImportBind ::= (ID OP_EQ)? ID
+
+/** Declarations (http://dlang.org/declaration.html) */
+Declaration ::= (AliasDeclaration | AliasThisDeclaration | ImportDeclaration | StructDeclaration
+               | ClassDeclaration | InterfaceDeclaration | EnumDeclaration | UnionDeclaration | Decl)
+AliasDeclaration ::=  KW_ALIAS (StorageClass* BasicType Declarators | AliasInitializerList) OP_SCOLON
+AliasThisDeclaration ::= KW_ALIAS ID KW_THIS
+AliasInitializerList ::= AliasInitializer (OP_COMMA AliasInitializer)*
+AliasInitializer ::= ID TemplateParameters? OP_EQ Type
+
+BasicType ::= (BasicTypeX | OP_DOT? IdentifierList | Typeof OP_DOT IdentifierList | Typeof )
+
+BasicTypeX ::= (KW_BOOL | KW_BYTE | KW_UBYTE | KW_SHORT | KW_USHORT
+              | KW_INT | KW_UINT | KW_LONG | KW_ULONG | KW_CHAR | KW_WCHAR
+              | KW_DCHAR | KW_FLOAT | KW_DOUBLE | KW_REAL | KW_IFLOAT | KW_IDOUBLE
+              | KW_IREAL | KW_CFLOAT | KW_CDOUBLE | KW_CREAL | KW_VOID)
+
+IdentifierList ::= (TemplateInstance | ID) (OP_DOT (TemplateInstance | ID))*
+
+Typeof ::= KW_TYPEOF OP_PAR_LEFT ( Expression | KW_RETURN | KW_SUPER | KW_THIS) OP_PAR_RIGHT
+
+TypeCISI ::= (KW_CONST | KW_IMMUTABLE | KW_SHARED | KW_INOUT) OP_PAR_LEFT Type OP_PAR_RIGHT
+
+Type ::= TypeCtors? BasicType Declarator2?
+
+TypeCtors ::= (KW_CONST | KW_IMMUTABLE | KW_SHARED | KW_INOUT)+
+
+TypeCtor ::= (KW_CONST | KW_IMMUTABLE | KW_SHARED | KW_INOUT)
+
+Declarator ::= BasicType2* ( OP_PAR_LEFT Declarator OP_PAR_RIGHT | ID) DeclaratorSuffixes?
+
+Declarator2 ::= BasicType2* (OP_PAR_LEFT Declarator2 OP_PAR_RIGHT)? DeclaratorSuffixes?
+
+BasicType2 ::= (OP_ASTERISK | OP_BRACKET_LEFT OP_BRACKET_RIGHT | OP_BRACKET_LEFT Expression OP_BRACKET_RIGHT
+              | OP_BRACKET_LEFT Expression OP_DDOT Expression OP_BRACKET_RIGHT
+              | OP_BRACKET_LEFT Type OP_BRACKET_RIGHT
+              | KW_DELEGATE Parameters MemberFunctionAttributes? | KW_FUNCTION Parameters FunctionAttributes?)
+
+Parameters ::= OP_PAR_LEFT ( Parameter (OP_COMMA Parameter)* )? OP_PAR_RIGHT
+
+Parameter ::= InOutX* (BasicType Declarator (OP_TRIPLEDOT | OP_EQ DefaultInitializerExpression)? | Type OP_TRIPLEDOT? )
+InOutX ::= KW_AUTO | TypeCtor | KW_FINAL | KW_IN | KW_LAZY | KW_OUT | KW_REF | KW_SCOPE
+
+private DeclaratorSuffixes ::= DeclaratorSuffix+
+DeclaratorSuffix ::= (OP_BRACKET_LEFT OP_BRACKET_RIGHT
+                    | OP_BRACKET_LEFT (Expression | Type) OP_BRACKET_RIGHT //TODO: Use AssignExpression here
+                    | TemplateParameters Parameters MemberFunctionAttributes? Constraint?
+                    | Parameters MemberFunctionAttributes?)
+
+MemberFunctionAttributes ::= (KW_CONST | KW_IMMUTABLE | KW_SHARED | KW_INOUT | FunctionAttribute)+
+FunctionAttributes ::= FunctionAttribute+
+FunctionAttribute ::= (KW_NOTHROW | KW_PURE | Property)
+
+Constraint ::= KW_IF OP_PAR_LEFT Expression OP_PAR_RIGHT
+
+SpecialKeyword ::= KW___FILE__ | KW___MODULE__ | KW___LINE__| KW___FUNCTION__ | KW___PRETTY_FUNCTION__
+//TODO: Use "AssignExpression" here
+DefaultInitializerExpression ::= (Expression | KW___FILE__ | KW___MODULE__ | KW___LINE__| KW___FUNCTION__
+                                | KW___PRETTY_FUNCTION__)
+
+Decl ::= ( (TypeCISI | StorageClass* BasicType) Declarators (OP_SCOLON | FunctionBody) | AutoDeclaration )
+
+StorageClass ::= ( KW_ABSTRACT | KW_AUTO | KW_CONST | KW_IMMUTABLE | KW_SHARED | KW_INOUT | KW_DEPRECATED
+                 | KW_ENUM | LinkageAttribute | Property | KW_EXTERN | KW_FINAL | KW_NOTHROW
+                 | KW_OVERRIDE | KW_PURE | KW___GSHARED | KW_SCOPE | KW_STATIC | KW_SYNCHRONIZED | KW_REF )
+LinkageAttribute ::= KW_EXTERN OP_PAR_LEFT
+                     ("C" OP_PLUS_PLUS OP_COMMA IdentifierList | ("C" OP_PLUS_PLUS | "C" | "D" | "Windows" | "Pascal" | "System"))
+                     OP_PAR_RIGHT
+
+Declarators ::= DeclaratorInitializer (OP_COMMA DeclaratorIdentifierList)? {recoverWhile="Declarators_recover"}
+private Declarators_recover ::= !(OP_SCOLON | OP_BRACES_LEFT)
+DeclaratorInitializer ::= Declarator (TemplateParameters? OP_EQ Initializer)?
+DeclaratorIdentifierList ::= DeclaratorIdentifier (OP_COMMA DeclaratorIdentifier)*
+DeclaratorIdentifier ::= ID (TemplateParameters? OP_EQ Initializer)?
+
+Initializer ::= (KW_VOID | NonVoidInitializer)
+private NonVoidInitializer ::= ExpInitializer | ArrayInitializer | StructInitializer
+ExpInitializer ::= Expression //TODO: "AssignExpression" must be used here
+ArrayInitializer ::= OP_BRACKET_LEFT (ArrayMemberInitialization (OP_COMMA ArrayMemberInitialization)* )? OP_BRACKET_RIGHT
+ArrayMemberInitialization ::= NonVoidInitializer | Expression OP_COLON NonVoidInitializer //TODO: Use "AssignExpression" here
+StructInitializer ::= OP_BRACES_LEFT (StructMemberInitializer (OP_COMMA StructMemberInitializer)* )? OP_BRACES_RIGHT
+StructMemberInitializer ::= NonVoidInitializer | ID OP_COLON NonVoidInitializer
+
+AutoDeclaration ::= StorageClass+ ID TemplateParameters? OP_EQ Initializer (OP_COMMA ID TemplateParameters? OP_EQ Initializer)* OP_SCOLON
+
+/* Attribute rules (http://dlang.org/attribute.html)*/
+AttributeSpecifier ::= Attribute (OP_COLON | DeclarationBlock)
+private Attribute ::= LinkageAttribute | AlignAttribute | Pragma | DeprecatedAttribute | ProtectionAttribute | Property
+            | KW_STATIC | KW_EXTERN | KW_FINAL | KW_SYNCHRONIZED | KW_OVERRIDE
+            | KW_ABSTRACT | KW_AUTO | KW_SCOPE | KW_CONST | KW_IMMUTABLE | KW_INOUT
+            | KW_SHARED | KW___GSHARED
+
+AlignAttribute ::= KW_ALIGN (OP_PAR_LEFT INTEGER_LITERAL OP_PAR_RIGHT)?
+Pragma ::= KW_PRAGMA OP_PAR_LEFT ID (OP_COMMA ArgumentList)? OP_PAR_RIGHT
+DeprecatedAttribute ::= KW_DEPRECATED (OP_PAR_LEFT STRING OP_PAR_RIGHT) ?
+ProtectionAttribute ::= KW_PRIVATE | KW_PACKAGE | KW_PROTECTED | KW_PUBLIC | KW_EXPORT
+
+Property ::= ( OP_AT (KW_PROPERTY | KW_SAFE | KW_TRUSTED | KW_SYSTEM | KW_DISABLE | KW_NOGC)
+             | UserDefinedAttribute)
+UserDefinedAttribute ::= OP_AT (ID (OP_PAR_LEFT ArgumentList? OP_PAR_RIGHT)? | (OP_PAR_LEFT ArgumentList OP_PAR_RIGHT) )
+
+// Expression rules (http://dlang.org/expression.html)
+CommaExpression ::= Expression (OP_COMMA Expression)*
+
+Expression ::= Expression1 ( (OP_EQ | OP_PLUS_EQ | OP_MINUS_EQ | OP_MUL_EQ | OP_DIV_EQ | OP_MOD_EQ
+                            | OP_AND_EQ | OP_OR_EQ | OP_XOR_EQ | OP_TILDA_EQ | OP_SH_LEFT_EQ | OP_SH_RIGHT_EQ
+                            | OP_USH_RIGHT_EQ | OP_POW_EQ) Expression )?
+
+private Expression1 ::= Expression2 Expression1Rest?
+private Expression1Rest ::= OP_QUEST Expression OP_COLON Expression1
+private Expression2 ::= UnaryExpression Expression2Rest?
+private Expression2Rest ::= ( (OP_BOOL_OR | OP_BOOL_AND | OP_OR | OP_AND | OP_XOR | OP_EQ_EQ
+                     | OP_NOT_EQ | OP_SH_RIGHT | OP_SH_LEFT | OP_USH_RIGHT | OP_LESS_EQ | OP_GT_EQ | OP_LESS | OP_GT
+                     | OP_UNORD | OP_UNORD_EQ | OP_LESS_GR | OP_LESS_GR_EQ | OP_NOT_GR | OP_NOT_GR_EQ | OP_NOT_LESS
+                     | OP_NOT_LESS_EQ | OP_PLUS | OP_MINUS | OP_ASTERISK | OP_DIV | OP_MOD | KW_IN
+                     | OP_NOT KW_IN | OP_TILDA) Expression2 ) *
+
+UnaryExpression ::= (OP_AND | OP_PLUS_PLUS | OP_MINUS_MINUS | OP_ASTERISK | OP_MINUS | OP_PLUS | OP_NOT | OP_TILDA
+                   | KW_DELETE | CastPrefix) *
+                   (OP_PAR_LEFT Type OP_PAR_RIGHT OP_DOT (TemplateInstance|ID) | PostfixExpression)
+                   (OP_POW UnaryExpression)?
+
+CastPrefix ::= KW_CAST OP_PAR_LEFT (Type | (KW_CONST | KW_CONST KW_SHARED
+             | KW_SHARED KW_CONST | KW_INOUT | KW_INOUT KW_SHARED
+             | KW_SHARED KW_INOUT | KW_IMMUTABLE | KW_SHARED)? ) OP_PAR_RIGHT
+
+private PostfixExpression ::= (PrimaryExpression
+                    | TypeCtors? BasicType OP_PAR_LEFT OP_PAR_RIGHT
+                    | TypeCtors? BasicType OP_PAR_LEFT ArgumentList OP_PAR_RIGHT)
+                     (OP_DOT TemplateInstance
+                    | OP_DOT ID
+                    | OP_DOT NewExpression
+                    | OP_PLUS_PLUS | OP_MINUS_MINUS
+                    | OP_PAR_LEFT OP_PAR_RIGHT
+                    | OP_PAR_LEFT ArgumentList OP_PAR_RIGHT
+                    | OP_BRACKET_LEFT ArgumentList OP_BRACKET_RIGHT
+                    | OP_BRACKET_LEFT OP_BRACKET_RIGHT
+                    | OP_BRACKET_LEFT Expression OP_DDOT Expression OP_BRACKET_RIGHT)*
+
+private PrimaryExpression ::= (OP_DOT TemplateInstance | TemplateInstance | OP_DOT? ID  | KW_THIS | KW_SUPER
+                     | KW_NULL | KW_TRUE | KW_FALSE | OP_DOLLAR | KW___FILE__ | KW___MODULE__ | KW___FUNCTION__
+                     | KW___PRETTY_FUNCTION__ | INTEGER_LITERAL | FLOAT_LITERAL | CHARACTER_LITERAL
+                     | STRING | ArrayLiteral | AssocArrayLiteral | FunctionLiteral | Lambda | AssertExpression
+                     | MixinStatement | ImportExpression | NewExpression | NewExpressionWithArgs
+                     | BasicType OP_DOT ID | Typeof | TypeidExpression | IsExpression | TraitsExpression
+                     | OP_PAR_LEFT Expression OP_PAR_RIGHT)
+
+NewExpression ::= KW_NEW (OP_PAR_LEFT ArgumentList OP_PAR_RIGHT)? Type
+
+NewExpressionWithArgs ::= KW_NEW (OP_PAR_LEFT ArgumentList OP_PAR_RIGHT)? Type
+                         (OP_PAR_LEFT ArgumentList OP_PAR_RIGHT | OP_BRACKET_LEFT Expression OP_BRACKET_RIGHT)
+
+ArgumentList ::= Expression (OP_COMMA Expression)*
+
+ArrayLiteral ::= OP_BRACKET_LEFT ArgumentList? OP_BRACKET_RIGHT
+
+AssocArrayLiteral ::= OP_BRACKET_LEFT KeyValuePair (OP_COMMA KeyValuePair)* OP_BRACKET_RIGHT
+KeyValuePair ::= Expression OP_COLON Expression
+
+FunctionLiteral ::= ( KW_FUNCTION Type? ParameterAttributes? FunctionBody
+                    | KW_DELEGATE Type? ParameterAttributes? FunctionBody
+                    | ParameterAttributes FunctionBody
+                    | FunctionBody) //XXX: Maybe add Lambda here? Or add Lambda to the PrimaryExpression rule?
+private ParameterAttributes ::= Parameters FunctionAttributes?
+
+Lambda ::= ( ID OP_LAMBDA_ARROW Expression
+           | (KW_FUNCTION|KW_DELEGATE)? ParameterAttributes OP_LAMBDA_ARROW Expression)
+
+AssertExpression ::= KW_ASSERT OP_PAR_LEFT Expression (OP_COMMA Expression)* OP_PAR_RIGHT
+
+ImportExpression ::= KW_IMPORT OP_PAR_LEFT Expression OP_PAR_RIGHT
+
+TypeidExpression ::= KW_TYPEID OP_PAR_LEFT (Type | Expression) OP_PAR_RIGHT
+
+IsExpression ::= KW_IS OP_PAR_LEFT Type (
+                 OP_COLON TypeSpecialization
+               | OP_EQ_EQ TypeSpecialization
+               | ID
+               | ID OP_COLON TypeSpecialization (OP_COMMA TemplateParameterList)?
+               | ID OP_EQ_EQ TypeSpecialization (OP_COMMA TemplateParameterList)? ) OP_PAR_RIGHT
+
+TypeSpecialization ::= Type | KW_STRUCT | KW_UNION | KW_CLASS | KW_INTERFACE | KW_EXTERN
+                     | KW_FUNCTION | KW_DELEGATE | KW_SUPER | KW_CONST | KW_IMMUTABLE
+                     | KW_INOUT | KW_SHARED | KW_RETURN | KW___PARAMETERS
+
+/** Statement from http://dlang.org/statement **/
+Statement ::= OP_SCOLON | NonEmptyStatement | BlockStatement
+BlockStatement ::= OP_BRACES_LEFT Statement* OP_BRACES_RIGHT
+ScopeStatement ::= NonEmptyStatement | BlockStatement
+private NonEmptyStatement ::= NonEmptyStatementNoCaseNoDefault | CaseStatement | CaseRangeStatement | DefaultStatement
+private NonEmptyStatementNoCaseNoDefault ::= (ID OP_COLON Expression) | Expression OP_SCOLON | Declaration
+                                    | IfStatement | WhileStatement | DoStatement | ForStatement | ForeachStatement
+                                    | SwitchStatement | ContinueStatement | BreakStatement | ReturnStatement
+                                    | GotoStatement | WithStatement | SynchronizedStatement | TryStatement
+                                    | ScopeGuardStatement | ThrowStatement | AsmStatement | PragmaStatement
+                                    | MixinStatement | ForeachRangeStatement | ConditionalStatement | StaticAssert
+                                    | TemplateMixin | ImportDeclaration
+IfStatement ::= KW_IF OP_PAR_LEFT IfCondition OP_PAR_RIGHT ScopeStatement (KW_ELSE ScopeStatement)?
+IfCondition ::= Expression | KW_AUTO ID OP_EQ Expression
+              | TypeCtors ID OP_EQ Expression
+              | TypeCtors? BasicType ID OP_EQ Expression
+WhileStatement ::= KW_WHILE OP_PAR_LEFT Expression OP_PAR_RIGHT ScopeStatement
+DoStatement ::= KW_DO ScopeStatement KW_WHILE OP_PAR_LEFT Expression OP_PAR_RIGHT OP_SCOLON
+ForStatement ::= KW_FOR OP_PAR_LEFT (OP_SCOLON | NonEmptyStatement | BlockStatement) Expression OP_SCOLON Expression OP_PAR_RIGHT ScopeStatement
+ForeachStatement ::= (KW_FOREACH | KW_FOREACH_REVERSE) OP_PAR_LEFT ForeachTypes OP_SCOLON Expression OP_PAR_RIGHT (NonEmptyStatement | BlockStatement)
+ForeachTypes ::= ForeachType (OP_COMMA ForeachType)*
+ForeachType ::= KW_REF? TypeCtors? (BasicType Declarator | ID)
+SwitchStatement ::= KW_FINAL? KW_SWITCH OP_PAR_LEFT Expression OP_PAR_RIGHT ScopeStatement
+ContinueStatement ::= KW_CONTINUE ID? OP_SCOLON
+BreakStatement ::= KW_BREAK ID? OP_SCOLON
+ReturnStatement ::= KW_RETURN Expression? OP_SCOLON
+GotoStatement ::= KW_GOTO (ID | KW_DEFAULT | KW_CASE Expression?) OP_SCOLON
+WithStatement ::= KW_WITH OP_PAR_LEFT (Expression | Symbol | TemplateInstance) OP_PAR_RIGHT ScopeStatement
+SynchronizedStatement ::= KW_SYNCHRONIZED (OP_PAR_LEFT Expression OP_PAR_RIGHT)? ScopeStatement
+TryStatement ::= KW_TRY ScopeStatement (Catches FinallyStatement | Catches | FinallyStatement)
+Catches ::= LastCatch | (Catch+ LastCatch?)
+Catch ::= KW_CATCH OP_PAR_LEFT BasicType ID OP_PAR_RIGHT (NonEmptyStatement | BlockStatement)
+LastCatch ::= KW_CATCH (NonEmptyStatement | BlockStatement)
+FinallyStatement ::= KW_FINALLY (NonEmptyStatement | BlockStatement)
+ScopeGuardStatement ::= KW_SCOPE OP_PAR_LEFT ("exit" | "success" | "failure") OP_PAR_RIGHT (NonEmptyStatement | BlockStatement)
+ThrowStatement ::= KW_THROW Expression OP_SCOLON
+AsmStatement ::= KW_ASM OP_BRACES_LEFT (AsmInstruction (OP_SCOLON AsmInstruction)* )? OP_BRACES_RIGHT
+AsmInstruction ::= (ID OP_COLON)? "aaa" //TODO: Add full "AsmInstruction" list later
+PragmaStatement ::= Pragma (OP_SCOLON | NonEmptyStatement | BlockStatement)
+MixinStatement ::= KW_MIXIN OP_PAR_LEFT Expression OP_PAR_RIGHT //TODO: Check if AssignExpression is needed here
+ForeachRangeStatement ::= (KW_FOREACH | KW_FOREACH_REVERSE) OP_PAR_LEFT ForeachTypes OP_SCOLON Expression OP_DDOT Expression OP_PAR_RIGHT ScopeStatement
+ConditionalStatement ::= Condition (NonEmptyStatement | BlockStatement) (KW_ELSE (NonEmptyStatement | BlockStatement))?
+Condition ::= (VersionCondition | DebugCondition | StaticIfCondition)
+VersionCondition ::= KW_VERSION OP_PAR_LEFT (INTEGER_LITERAL | ID | KW_UNITTEST | KW_ASSERT) OP_PAR_RIGHT
+DebugCondition ::= KW_DEBUG (OP_PAR_LEFT (INTEGER_LITERAL | ID) OP_PAR_RIGHT)?
+StaticIfCondition ::= KW_STATIC KW_IF OP_PAR_LEFT Expression OP_PAR_RIGHT //TODO: Check if AssignExpression is needed here
+StaticAssert ::= KW_STATIC KW_ASSERT OP_PAR_LEFT Expression (OP_COMMA Expression)? OP_PAR_RIGHT OP_SCOLON //TODO: Check if AssignExpression is needed here
+
+CaseStatement ::= KW_CASE ArgumentList OP_COLON (OP_SCOLON | NonEmptyStatementNoCaseNoDefault | BlockStatement)*
+CaseRangeStatement ::= KW_CASE Expression OP_COLON OP_DDOT KW_CASE Expression OP_COLON (OP_SCOLON | NonEmptyStatementNoCaseNoDefault | BlockStatement)+ //TODO: Check if AssignExpression is needed here
+DefaultStatement ::= KW_DEFAULT OP_COLON (OP_SCOLON | NonEmptyStatementNoCaseNoDefault | BlockStatement)+
+
+/** http://dlang.org/template-mixin.html#TemplateMixin */
+TemplateMixinDeclaration ::= KW_MIXIN KW_TEMPLATE ID TemplateParameters Constraint? OP_BRACES_LEFT DeclDef* OP_BRACES_RIGHT
+TemplateMixin ::= KW_MIXIN MixinTemplateName TemplateArguments? ID? OP_SCOLON
+MixinTemplateName ::= OP_DOT QualifiedIdentifierList | Typeof OP_DOT QualifiedIdentifierList | QualifiedIdentifierList
+QualifiedIdentifierList ::= ID | (ID | TemplateInstance) (OP_DOT (ID|TemplateInstance))+
+
+/** http://dlang.org/unittest.html */
+UnitTest ::= KW_UNITTEST FunctionBody
+
+/** Struct rules http://dlang.org/struct.html **/
+StructDeclaration ::= ( KW_STRUCT (ID AggregateBody | ID OP_SCOLON | AggregateBody)
+                      | StructTemplateDeclaration )
+DeclarationBlock ::= DeclDef | OP_BRACES_LEFT DeclDef* OP_BRACES_RIGHT
+AggregateBody ::= OP_BRACES_LEFT DeclDef* OP_BRACES_RIGHT
+DeclDef ::= (AttributeSpecifier | Declaration | Constructor | Destructor | Postblit | Allocator | Deallocator
+| Invariant | AliasThis | StaticConstructor | StaticDestructor | SharedStaticConstructor | SharedStaticDestructor
+| ConditionalDeclaration | DebugSpecification | VersionSpecification | StaticAssert | MixinDeclaration
+| TemplateDeclaration | TemplateMixinDeclaration | TemplateMixin | UnitTest | OP_SCOLON)
+
+Constructor ::= ( KW_THIS Parameters MemberFunctionAttributes? (OP_SCOLON | FunctionBody)
+                | ConstructorTemplate )
+Destructor ::= OP_TILDA KW_THIS OP_PAR_LEFT OP_PAR_RIGHT MemberFunctionAttributes? (OP_SCOLON | FunctionBody)
+Postblit ::= KW_THIS OP_PAR_LEFT KW_THIS OP_PAR_RIGHT MemberFunctionAttributes? (OP_SCOLON | FunctionBody)
+Allocator ::= KW_NEW Parameters (OP_SCOLON | FunctionBody)
+Deallocator ::= KW_DELETE Parameters (OP_SCOLON | FunctionBody)
+Invariant ::= KW_INVARIANT OP_PAR_LEFT OP_PAR_RIGHT BlockStatement
+AliasThis ::=  AliasThisDeclaration OP_SCOLON
+StaticConstructor ::= KW_STATIC KW_THIS OP_PAR_LEFT OP_PAR_RIGHT (OP_SCOLON | FunctionBody)
+StaticDestructor ::= KW_STATIC OP_TILDA KW_THIS OP_PAR_LEFT OP_PAR_RIGHT MemberFunctionAttributes? (OP_SCOLON | FunctionBody)
+SharedStaticConstructor ::= KW_SHARED KW_STATIC KW_THIS OP_PAR_LEFT OP_PAR_RIGHT (OP_SCOLON | FunctionBody)
+SharedStaticDestructor ::= KW_SHARED KW_STATIC OP_TILDA KW_THIS OP_PAR_LEFT OP_PAR_RIGHT MemberFunctionAttributes? (OP_SCOLON | FunctionBody)
+ConditionalDeclaration ::= Condition ( DeclarationBlock KW_ELSE OP_COLON DeclDef* | DeclarationBlock KW_ELSE DeclarationBlock | DeclarationBlock | OP_COLON DeclDef*)
+DebugSpecification ::= KW_DEBUG OP_EQ (ID | INTEGER_LITERAL) OP_SCOLON
+VersionSpecification ::= KW_VERSION OP_EQ (ID | INTEGER_LITERAL) OP_SCOLON
+MixinDeclaration ::= MixinStatement OP_SCOLON
+
+/** Class rules http://dlang.org/c  lass.html#ClassDeclaration **/
+ClassDeclaration ::= ( KW_CLASS ComponentName (OP_SCOLON | BaseClassList? AggregateBody)
+                     | ClassTemplateDeclaration ) {
+                     implements="org.dlangplugin.psi.DLangClass" methods=[getName setName getNameIdentifier getPresentation]}
+ComponentName ::= identifier
+{extends="org.dlangplugin.psi.impl.DLangNamedElementImpl" implements="org.dlangplugin.psi.DLangNamedElement"}
+
+identifier ::= ID
+
+BaseClassList ::= OP_COLON (TemplateInstance|ReferenceExpression) (OP_COMMA (TemplateInstance|ReferenceExpression))*
+ReferenceExpression ::= ID
+{mixin="org.dlangplugin.psi.impl.DLangReferenceImpl" implements="org.dlangplugin.psi.DLangReference"}
+
+/** Interface rules http://dlang.org/interface.html#InterfaceDeclaration **/
+InterfaceDeclaration ::= ( KW_INTERFACE ID (OP_SCOLON | BaseInterfaceList? AggregateBody)
+                         | InterfaceTemplateDeclaration )
+BaseInterfaceList ::= OP_COLON ID (OP_COMMA ID)*
+
+/** Enum rules http://dlang.org/enum.html#EnumDeclaration **/
+EnumDeclaration ::= KW_ENUM ID? (OP_COLON Type)? EnumBody
+EnumBody ::= (OP_SCOLON | OP_BRACES_LEFT EnumMember (OP_COMMA EnumMember)* OP_COMMA? OP_BRACES_RIGHT)
+EnumMember ::= Type ID OP_EQ Expression | ID OP_EQ Expression | ID //TODO: Use "AssignExpression" here
+
+/** Enum rules http://dlang.org/enum.html#EnumDeclaration **/
+UnionDeclaration ::= ( KW_UNION (ID AggregateBody | ID OP_SCOLON | AggregateBody)
+                     | UnionTemplateDeclaration )
+
+/** Function rules http://dlang.org/function.html **/
+FunctionBody ::= BlockStatement | (InStatement OutStatement | OutStatement InStatement | InStatement | OutStatement)? BodyStatement
+InStatement ::= KW_IN BlockStatement
+OutStatement ::= KW_OUT (OP_PAR_LEFT ID OP_PAR_RIGHT)? BlockStatement
+BodyStatement ::= KW_BODY BlockStatement
+
+/** Template rules http://dlang.org/template.html **/
+TemplateDeclaration ::= KW_TEMPLATE ID TemplateParameters Constraint? OP_BRACES_LEFT DeclDef* OP_BRACES_RIGHT
+private TemplateParameters ::= OP_PAR_LEFT TemplateParameterList? OP_PAR_RIGHT
+TemplateParameterList ::= TemplateParameter (OP_COMMA TemplateParameter)*
+TemplateParameter ::= TemplateValueParameter | TemplateTupleParameter | TemplateTypeParameter
+                    | TemplateAliasParameter | TemplateThisParameter
+TemplateValueParameter ::= BasicType Declarator (OP_COLON Expression)? (OP_EQ Expression|SpecialKeyword)? //TODO: Use ConditionalExpression and AssignExpression here
+TemplateTupleParameter ::= ID OP_TRIPLEDOT
+TemplateTypeParameter  ::= ID (OP_COLON Type)? (OP_EQ Type)?
+TemplateAliasParameter ::= KW_ALIAS (ID | BasicType Declarator) (OP_COLON Type|Expression)? (OP_EQ Type|Expression)? //TODO: use ConditionalExpression here
+TemplateThisParameter  ::= KW_THIS TemplateTypeParameter
+
+TemplateInstance ::= ID TemplateArguments
+TemplateArgument ::= <<parseTemplateArgument>>
+TemplateArguments ::= OP_NOT ( OP_PAR_LEFT (TemplateArgument (OP_COMMA TemplateArgument)* )? OP_PAR_RIGHT| TemplateSingleArgument)
+TemplateSingleArgument ::= ID | BasicTypeX | CHARACTER_LITERAL | STRING | INTEGER_LITERAL | FLOAT_LITERAL
+                         | KW_TRUE | KW_FALSE | KW_NULL | KW_THIS | SpecialKeyword
+
+Symbol ::= OP_DOT? (TemplateInstance|ID) (OP_DOT (TemplateInstance|ID))*
+
+/** Constructor template http://dlang.org/template.html#ConstructorTemplate **/
+ConstructorTemplate ::= KW_THIS TemplateParameters Parameters MemberFunctionAttributes? Constraint? (OP_COLON | FunctionBody)
+
+/** Aggregate Templates **/
+ClassTemplateDeclaration ::= KW_CLASS ClassName TemplateParameters
+    (BaseClassList Constraint | Constraint BaseClassList | Constraint | BaseClassList)? AggregateBody
+
+InterfaceTemplateDeclaration ::= KW_INTERFACE ID TemplateParameters
+    (BaseClassList Constraint | Constraint BaseClassList | Constraint | BaseClassList)? AggregateBody
+
+StructTemplateDeclaration ::= KW_STRUCT ID TemplateParameters Constraint? AggregateBody
+UnionTemplateDeclaration ::= KW_UNION ID TemplateParameters Constraint? AggregateBody
+
+/** Traits http://dlang.org/traits.html **/
+TraitsExpression ::= KW___TRAITS OP_PAR_LEFT TRAITS_KEYWORD (OP_COMMA TraitsArguments)? OP_PAR_RIGHT
+TraitsArguments ::= (Expression | Type) (OP_COMMA (Expression | Type))*

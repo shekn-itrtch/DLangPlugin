@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="dlang" default="all">
+  
+  
+  <property file="dlang.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property environment="env"/>
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.orig/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <path id="jdk.classpath.idea_jdk">
+    <fileset dir="${env.JAVA_HOME}/jre">
+      <include name="lib/rt.jar"/>
+    </fileset>
+    <fileset dir="${jdk.home.idea_jdk}">
+      <include name="lib/annotations.jar"/>
+      <include name="lib/asm-all.jar"/>
+      <include name="lib/asm-commons.jar"/>
+      <include name="lib/asm.jar"/>
+      <include name="lib/asm4-all.jar"/>
+      <include name="lib/automaton.jar"/>
+      <include name="lib/boot.jar"/>
+      <include name="lib/bootstrap.jar"/>
+      <include name="lib/cglib-2.2.2.jar"/>
+      <include name="lib/cli-parser-1.1.jar"/>
+      <include name="lib/commons-codec-1.8.jar"/>
+      <include name="lib/commons-httpclient-3.1-patched.jar"/>
+      <include name="lib/commons-logging-1.1.3.jar"/>
+      <include name="lib/commons-net-3.1.jar"/>
+      <include name="lib/ecj-4.3.2.jar"/>
+      <include name="lib/extensions.jar"/>
+      <include name="lib/fluent-hc-4.3.2.jar"/>
+      <include name="lib/forms_rt.jar"/>
+      <include name="lib/groovy-all-2.2.1.jar"/>
+      <include name="lib/gson-2.2.4.jar"/>
+      <include name="lib/guava-14.0.1.jar"/>
+      <include name="lib/hamcrest-core-1.3.jar"/>
+      <include name="lib/hamcrest-library-1.3.jar"/>
+      <include name="lib/httpclient-4.3.2.jar"/>
+      <include name="lib/httpcore-4.3.1.jar"/>
+      <include name="lib/httpmime-4.3.2.jar"/>
+      <include name="lib/icons.jar"/>
+      <include name="lib/idea.jar"/>
+      <include name="lib/idea_rt.jar"/>
+      <include name="lib/isorelax.jar"/>
+      <include name="lib/javac2.jar"/>
+      <include name="lib/jaxen-1.1.3.jar"/>
+      <include name="lib/jayatana-1.2.4.jar"/>
+      <include name="lib/jcip-annotations.jar"/>
+      <include name="lib/jdkAnnotations.jar"/>
+      <include name="lib/jdom.jar"/>
+      <include name="lib/jgoodies-common-1.2.1.jar"/>
+      <include name="lib/jgoodies-forms.jar"/>
+      <include name="lib/jgoodies-looks-2.4.2.jar"/>
+      <include name="lib/jh.jar"/>
+      <include name="lib/jing.jar"/>
+      <include name="lib/jna-utils.jar"/>
+      <include name="lib/jna.jar"/>
+      <include name="lib/jps-launcher.jar"/>
+      <include name="lib/jps-server.jar"/>
+      <include name="lib/jsch-0.1.50.jar"/>
+      <include name="lib/jsch.agentproxy.connector-factory.jar"/>
+      <include name="lib/jsch.agentproxy.core.jar"/>
+      <include name="lib/jsch.agentproxy.pageant.jar"/>
+      <include name="lib/jsch.agentproxy.sshagent.jar"/>
+      <include name="lib/jsch.agentproxy.usocket-jna.jar"/>
+      <include name="lib/jsch.agentproxy.usocket-nc.jar"/>
+      <include name="lib/jsr166e.jar"/>
+      <include name="lib/jsr173_1.0_api.jar"/>
+      <include name="lib/junit-4.11.jar"/>
+      <include name="lib/jzlib-1.1.1.jar"/>
+      <include name="lib/log4j.jar"/>
+      <include name="lib/markdownj-core-0.4.2-SNAPSHOT.jar"/>
+      <include name="lib/microba.jar"/>
+      <include name="lib/miglayout-swing.jar"/>
+      <include name="lib/nanoxml-2.2.3.jar"/>
+      <include name="lib/nekohtml-1.9.14.jar"/>
+      <include name="lib/netty-all-5.0.0.Alpha2.jar"/>
+      <include name="lib/openapi.jar"/>
+      <include name="lib/optimizedFileManager.jar"/>
+      <include name="lib/oromatcher.jar"/>
+      <include name="lib/picocontainer.jar"/>
+      <include name="lib/protobuf-2.5.0.jar"/>
+      <include name="lib/proxy-vole_20120920.jar"/>
+      <include name="lib/pty4j-0.3.jar"/>
+      <include name="lib/purejavacomm.jar"/>
+      <include name="lib/resolver.jar"/>
+      <include name="lib/resources.jar"/>
+      <include name="lib/resources_en.jar"/>
+      <include name="lib/rhino-js-1_7R4.jar"/>
+      <include name="lib/rngom-20051226-patched.jar"/>
+      <include name="lib/sanselan-0.98-snapshot.jar"/>
+      <include name="lib/serviceMessages.jar"/>
+      <include name="lib/snappy-java-1.0.5.jar"/>
+      <include name="lib/swingx-core-1.6.2.jar"/>
+      <include name="lib/trang-core.jar"/>
+      <include name="lib/trove4j.jar"/>
+      <include name="lib/trove4j_src.jar"/>
+      <include name="lib/util.jar"/>
+      <include name="lib/velocity.jar"/>
+      <include name="lib/winp-1.17-patched.jar"/>
+      <include name="lib/xbean.jar"/>
+      <include name="lib/xerces.jar"/>
+      <include name="lib/xmlrpc-2.0.jar"/>
+      <include name="lib/xpp3-1.1.4-min.jar"/>
+      <include name="lib/xstream-1.4.3.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value=""/>
+  <property name="project.jdk.bin" value=""/>
+  <property name="project.jdk.classpath" value=""/>
+  
+  
+  <!-- Global Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm-all.jar"/>
+    <pathelement location="${javac2.home}/asm4-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module Dlang -->
+  
+  <dirname property="module.dlang.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.dlang" value="${jdk.home.idea_jdk}"/>
+  <property name="module.jdk.bin.dlang" value="${env.JDK_HOME}/bin"/>
+  <property name="module.jdk.classpath.dlang" value="jdk.classpath.idea_jdk"/>
+  
+  <property name="compiler.args.dlang" value="-encoding UTF-8 -source 1.6 -target 1.6 ${compiler.args}"/>
+  
+  <property name="dlang.output.dir" value="${module.dlang.basedir}/out/production/Dlang"/>
+  <property name="dlang.output.metainf.dir" value="${dlang.output.dir}/META-INF"/>
+  <property name="dlang.testoutput.dir" value="${module.dlang.basedir}/out/test/Dlang"/>
+  
+  <path id="dlang.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="dlang.module.production.classpath">
+    <path refid="${module.jdk.classpath.dlang}"/>
+    
+  </path>
+  
+  <path id="dlang.runtime.production.module.classpath">
+    <pathelement location="${dlang.output.dir}"/>
+    
+  </path>
+  
+  <path id="dlang.module.classpath">
+    <path refid="${module.jdk.classpath.dlang}"/>
+    <pathelement location="${dlang.output.dir}"/>
+    
+  </path>
+  
+  <path id="dlang.runtime.module.classpath">
+    <pathelement location="${dlang.testoutput.dir}"/>
+    <pathelement location="${dlang.output.dir}"/>
+    
+  </path>
+  
+  
+  <patternset id="excluded.from.module.dlang">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.dlang">
+    <patternset refid="excluded.from.module.dlang"/>
+  </patternset>
+  
+  <path id="dlang.module.sourcepath">
+    <dirset dir="${module.dlang.basedir}">
+      <include name="src"/>
+      <include name="gen"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.dlang" depends="compile.module.dlang.production,compile.module.dlang.tests" description="Compile module Dlang"/>
+  
+  <target name="compile.module.dlang.production" depends="register.custom.compilers" description="Compile module Dlang; production classes">
+    <mkdir dir="${dlang.output.dir}"/>
+    <javac2 destdir="${dlang.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.dlang}/javac" includeantruntime="false">
+      <compilerarg line="${compiler.args.dlang}"/>
+      <bootclasspath refid="dlang.module.bootclasspath"/>
+      <classpath refid="dlang.module.production.classpath"/>
+      <src refid="dlang.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.dlang"/>
+    </javac2>
+    
+    <!-- Copy resources without changing -->
+    <copy todir="${dlang.output.dir}">
+      <fileset dir="${module.dlang.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.dlang.basedir}/gen">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.dlang.basedir}/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+
+    <!-- Process META-INF content with filters -->
+    <copy todir="${dlang.output.metainf.dir}">
+      <fileset dir="${module.dlang.basedir}/META-INF">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <!-- Replace variables ${a.b.c} using "dlang.properties" -->
+      <filterset begintoken="${" endtoken="}">
+         <filtersfile file="dlang.properties"/>
+      </filterset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.dlang.tests" depends="register.custom.compilers,compile.module.dlang.production" description="compile module Dlang; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.dlang" description="cleanup module">
+    <delete dir="${dlang.output.dir}"/>
+    <delete dir="${dlang.testoutput.dir}"/>
+    <delete file="${dlang.plugin.path.jar}"/>
+  </target>
+  
+  <property name="dlang.plugin.path.jar" value="${module.dlang.basedir}/out/Dlang-${dlang.version}.jar"/>
+  
+  <!-- Build archive for plugin 'Dlang' -->
+  <target name="plugin.build.jar.dlang" depends="compile.module.dlang" description="Build plugin archive for module &#39;Dlang&#39;">
+    <jar destfile="${dlang.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${dlang.output.dir}"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.dlang" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, plugin.build.jar.dlang" description="build all modules"/>
+  
+  <target name="all" depends="build.modules" description="build all"/>
+</project>

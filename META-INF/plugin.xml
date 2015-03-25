@@ -1,0 +1,60 @@
+<idea-plugin version="2">
+    <id>org.dlangplugin</id>
+    <name>D Language Support</name>
+    <version>${dlang.version}</version>
+    <vendor email="mail@example.org">D Lang</vendor>
+
+    <description><![CDATA[
+        D Language support for IntelliJ IDEA 14
+      ]]></description>
+
+    <change-notes><![CDATA[
+        Early alpha release
+      ]]>
+    </change-notes>
+
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="139.1"/>
+
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <action id="NewDFile" class="org.dlangplugin.CreateDFileAction">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="org.dlangplugin.DFileTypeFactory"/>
+        <lang.parserDefinition language="Dlang" implementationClass="org.dlangplugin.DParserDefinition"/>
+        <lang.syntaxHighlighterFactory key="Dlang" implementationClass="org.dlangplugin.DSyntaxHighlighterFactory"/>
+        <configurationType implementation="org.dlangplugin.run.DLangRunDubConfigurationType"/>
+        <configurationType implementation="org.dlangplugin.run.DLangRunDmdConfigurationType"/>
+        <configurationType implementation="org.dlangplugin.run.DLangRunAppConfigurationType"/>
+        <projectService serviceInterface="org.dlangplugin.config.DLangGeneralSettings"
+                        serviceImplementation="org.dlangplugin.config.DLangGeneralSettings"/>
+        <projectConfigurable instance="org.dlangplugin.config.DLangSettingsPanel" id="DLangSettingsPanel"
+                             displayName="D language" order="last"/>
+        <moduleType id="DLANG_MODULE" implementationClass="org.dlangplugin.module.DLangModuleType"/>
+        <moduleBuilder id="DLangModuleBuilder" builderClass="org.dlangplugin.module.DLangModuleBuilder"/>
+        <moduleBuilder id="DLangDubModuleBuilder" builderClass="org.dlangplugin.module.DLangDubModuleBuilder"/>
+        <moduleConfigurationEditorProvider implementation="org.dlangplugin.module.DLangModuleEditorsProvider"/>
+        <sdkType implementation="org.dlangplugin.sdk.DLangSdkType"/>
+        <library.type implementation="org.dlangplugin.library.DLangLibraryType"/>
+        <orderRootType implementation="org.dlangplugin.library.LibFileRootType" id="LIBRARY_FILE" order="FIRST"/>
+        <OrderRootTypeUI key="LIBRARY_FILE" implementationClass="org.dlangplugin.library.LibFileRootTypeUIFactory"/>
+
+        <fileBasedIndex implementation="org.dlangplugin.ide.index.DLangComponentIndex"/>
+        <gotoClassContributor implementation="org.dlangplugin.ide.DLangClassContributor" />
+    </extensions>
+</idea-plugin>
