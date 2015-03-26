@@ -2,7 +2,7 @@
     <id>org.dlangplugin</id>
     <name>D Language Support</name>
     <version>${dlang.version}</version>
-    <vendor email="mail@example.org">D Lang</vendor>
+    <vendor url="https://vivaldi.net/en-US/blogs/entry/new-dlang-plugin" email="sheknitrtch@vivaldi.net">D Lang</vendor>
 
     <description><![CDATA[
         D Language support for IntelliJ IDEA 14
