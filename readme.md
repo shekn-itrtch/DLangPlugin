@@ -15,6 +15,8 @@ See [dlang.org](http://dlang.org/), [DMD compiler sources](https://github.com/D-
 It's an early release. Only a few features are implemented: Syntax highlighting, Compilation using external tools,
 Class navigation. A lot of work lies ahead.
 
+![IntelliJ IDEA Screenshot](docs/images/DLangScreenshot.png)
+
 #### Contributing
 
 Any kind of contribution is welcomed; please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
