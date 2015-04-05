@@ -136,7 +136,7 @@ public class DLangModuleBuilder extends JavaModuleBuilder {
         }
     }
 
-    /* By default sources are located in {WORKING_DIR}/sources folder. */
+    /* By default sources are located in {WORKING_DIR}/source folder. */
     @NotNull
     @Override
     public List<Pair<String,String>> getSourcePaths() {
@@ -159,9 +159,4 @@ public class DLangModuleBuilder extends JavaModuleBuilder {
     public ModuleType getModuleType() {
         return DLangModuleType.getInstance();
     }
-
-    /*@Override
-    public boolean isTemplate() {
-        return true;
-    }*/
 }

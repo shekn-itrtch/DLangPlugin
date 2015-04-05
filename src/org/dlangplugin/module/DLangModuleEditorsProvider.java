@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.ui.configuration.CommonContentEntriesEditor;
 import com.intellij.openapi.roots.ui.configuration.DefaultModuleConfigurationEditorFactory;
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationEditorProvider;
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationState;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class DLangModuleEditorsProvider implements ModuleConfigurationEditorProv
 
         final DefaultModuleConfigurationEditorFactory editorFactory = DefaultModuleConfigurationEditorFactory.getInstance();
         List<ModuleConfigurationEditor> editors = new ArrayList<ModuleConfigurationEditor>();
-        editors.add(new CommonContentEntriesEditor(module.getName(), state));
+        editors.add(new CommonContentEntriesEditor(module.getName(), state, JavaSourceRootType.SOURCE, JavaSourceRootType.TEST_SOURCE));
         editors.add(new OutputElementsEditor(state));
         editors.add(editorFactory.createClasspathEditor(state));
         //editors.add(new DLangModuleBuildConfEditor(state)); //TODO: implement DLangModuleBuildConfEditor
