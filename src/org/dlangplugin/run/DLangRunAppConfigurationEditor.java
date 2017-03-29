@@ -61,8 +61,7 @@ public class DLangRunAppConfigurationEditor extends SettingsEditor<DLangRunAppCo
         fcd.setDescription(DLangBundle.message("dmd.run.config.selectworkingdir.description"));
         fcd.setHideIgnored(false);
 
-        pathWorkingDir.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathWorkingDir.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<>(fcd.getTitle(), fcd.getDescription(),
                         pathWorkingDir, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         return myMainPanel;

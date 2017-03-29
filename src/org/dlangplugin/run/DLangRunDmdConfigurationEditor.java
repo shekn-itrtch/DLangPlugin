@@ -34,8 +34,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
-/** DMD Compiler arguments UI. All properties are read from official docs:
- * @see http://dlang.org/dmd-linux.html#switches
+/**
+ * DMD Compiler arguments UI. All properties are read from official docs:
+ * @see <a href="http://dlang.org/dmd-linux.html#switches">dmd documentation</a>
  */
 public class DLangRunDmdConfigurationEditor extends SettingsEditor<DLangRunDmdConfiguration> {
     private JTabbedPane myMainPanel;
@@ -122,23 +123,19 @@ public class DLangRunDmdConfigurationEditor extends SettingsEditor<DLangRunDmdCo
         fcd.setDescription(DLangBundle.message("dmd.run.config.selectimportfolder.description"));
         fcd.setHideIgnored(false);
 
-        pathImports.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathImports.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<>(fcd.getTitle(), fcd.getDescription(),
                         pathImports, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         //XXX: fix title and description
-        pathStringImports.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathStringImports.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<>(fcd.getTitle(), fcd.getDescription(),
                         pathStringImports, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         //XXX: fix title and description
-        pathDocumentation.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathDocumentation.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<>(fcd.getTitle(), fcd.getDescription(),
                         pathDocumentation, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         //XXX: fix title and description
-        pathHeaderDir.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathHeaderDir.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<>(fcd.getTitle(), fcd.getDescription(),
                         pathHeaderDir, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         cbGenerateDocumentation.addChangeListener(new ChangeListener() {

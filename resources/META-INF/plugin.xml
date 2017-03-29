@@ -1,11 +1,11 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>org.dlangplugin</id>
     <name>D Language Support</name>
-    <version>${dlang.version}</version>
+    <version>0.1.0</version>
     <vendor url="https://vivaldi.net/en-US/unity/groups/item/157-dlang-plugin" email="sheknitrtch@vivaldi.net">D Lang</vendor>
 
     <description><![CDATA[
-        D Language support for IntelliJ IDEA 14
+        D Language support for IntelliJ IDEA
       ]]></description>
 
     <change-notes><![CDATA[
@@ -14,7 +14,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="139.1"/>
+    <idea-version since-build="171"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -37,10 +37,12 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.dlangplugin.DFileTypeFactory"/>
         <lang.parserDefinition language="Dlang" implementationClass="org.dlangplugin.DParserDefinition"/>
-        <lang.syntaxHighlighterFactory key="Dlang" implementationClass="org.dlangplugin.DSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="Dlang" implementationClass="org.dlangplugin.DSyntaxHighlighterFactory"/>
+
         <configurationType implementation="org.dlangplugin.run.DLangRunDubConfigurationType"/>
         <configurationType implementation="org.dlangplugin.run.DLangRunDmdConfigurationType"/>
         <configurationType implementation="org.dlangplugin.run.DLangRunAppConfigurationType"/>
+
         <projectService serviceInterface="org.dlangplugin.config.DLangGeneralSettings"
                         serviceImplementation="org.dlangplugin.config.DLangGeneralSettings"/>
         <projectConfigurable instance="org.dlangplugin.config.DLangSettingsPanel" id="DLangSettingsPanel"
