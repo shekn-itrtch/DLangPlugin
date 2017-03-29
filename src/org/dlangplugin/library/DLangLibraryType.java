@@ -62,7 +62,7 @@ public class DLangLibraryType extends LibraryType<DummyLibraryProperties> {
     }
 
     @Override
-    public Icon getIcon() {
+    public Icon getIcon(@Nullable DummyLibraryProperties properties) {
         return DLangIcons.LIBRARY;
     }
 

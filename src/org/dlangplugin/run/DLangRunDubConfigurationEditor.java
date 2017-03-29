@@ -17,7 +17,7 @@ import javax.swing.*;
 import java.util.Map;
 
 /** DUB build system configuration UI.
- * @see https://github.com/D-Programming-Language/dub
+ * @see <a href="https://github.com/D-Programming-Language/dub">dub documentation</a>
  */
 public class DLangRunDubConfigurationEditor extends SettingsEditor<DLangRunDubConfiguration>{
     private JPanel myMainPanel;
@@ -68,8 +68,7 @@ public class DLangRunDubConfigurationEditor extends SettingsEditor<DLangRunDubCo
         fcd.setDescription(DLangBundle.message("dmd.run.config.selectworkingdir.description"));
         fcd.setHideIgnored(false);
 
-        pathWorkingDir.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathWorkingDir.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
                         pathWorkingDir, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         return myMainPanel;

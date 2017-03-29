@@ -43,7 +43,7 @@ public class DLangRunAppConfiguration extends ModuleBasedConfiguration<RunConfig
         }
 
         workDir = PathUtil.getLocalPath(project.getBaseDir());
-        envVars = new HashMap<String, String>();
+        envVars = new HashMap<>();
     }
 
     public String getExecutablePath() {
@@ -68,7 +68,7 @@ public class DLangRunAppConfiguration extends ModuleBasedConfiguration<RunConfig
         Module[] modules = ModuleManager.getInstance(getProject()).getModules();
         final DMDRunner appRunner = new DMDRunner();
 
-        ArrayList<Module> res = new ArrayList<Module>();
+        ArrayList<Module> res = new ArrayList<>();
         for (Module module : modules) {
             if (appRunner.isValidModule(module)) {
                 res.add(module);
@@ -96,7 +96,7 @@ public class DLangRunAppConfiguration extends ModuleBasedConfiguration<RunConfig
     @Override
     public void writeExternal(@NotNull Element element) throws WriteExternalException {
         if(envVars == null) {
-            envVars = new HashMap<String, String>();
+            envVars = new HashMap<>();
         }
 
         super.writeExternal(element);

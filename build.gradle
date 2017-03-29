@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+    }
+}
+
+plugins {
+    id 'org.jetbrains.intellij' version '0.2.5'
+}
+
+sourceSets {
+    main {
+        java.srcDirs 'src', 'gen'
+        resources.srcDirs 'resources'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+tasks.withType(Javadoc).all { enabled = false }
+
+intellij {
+    version '2017.1' // for a full list of IntelliJ IDEA releases please see https://www.jetbrains.com/intellij-repository/releases
+    plugins 'coverage' //Bundled plugin dependencies
+    pluginName 'dlang'
+}
+
+group 'org.dlangplugin'
+version '0.1.0' // Plugin version
+
+apply plugin: 'idea'
+idea {
+    project {
+        jdkName = '1.8'
+        languageLevel = '1.8'
+    }
+    module {
+        generatedSourceDirs += file('gen')
+    }
+}

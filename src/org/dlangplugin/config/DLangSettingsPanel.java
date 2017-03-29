@@ -62,8 +62,7 @@ public class DLangSettingsPanel implements SearchableConfigurable {
         fcd.setDescription(DLangBundle.message("dub.config.selectexecutable.description"));
         fcd.setHideIgnored(false);
 
-        pathDubExecutable.addBrowseFolderListener(null,
-                new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
+        pathDubExecutable.addActionListener(new TextFieldWithBrowseButton.BrowseFolderActionListener<JTextField>(fcd.getTitle(), fcd.getDescription(),
                         pathDubExecutable, null, fcd, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) );
 
         return panel;
